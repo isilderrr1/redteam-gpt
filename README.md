@@ -9,27 +9,13 @@
 
 ---
 
-<<<<<<< HEAD
-##  Ambiente di Sviluppo & Architettura
-=======
 ## 🛠️ Development Environment & Architecture
->>>>>>> 357d975 (docs: add bilingual support (English/Italian))
 
 The project was developed in a modern, high-performance ecosystem:
 * **OS:** Ubuntu via WSL2 (Windows Subsystem for Linux).
 * **IDE:** Visual Studio Code.
-<<<<<<< HEAD
-* **LLM Engine:** LM Studio / Ollama (Local Inference per la massima privacy).
-* **Language:** Python 3.10+ con gestione ambienti virtuali (`venv`).
-###  Intelligence Engine
-Il cuore decisionale del sistema è alimentato da:
-* **LLM:** [DeepSeek-R1-14B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-14B)
-* **Inference Server:** LM Studio / Ollama.
-* **Reasoning Model:** Il sistema sfrutta le capacità di *Chain-of-Thought* di DeepSeek per analizzare i risultati dei tool e pianificare i passi successivi in modo autonomo.
-=======
 * **LLM Engine:** LM Studio / Ollama (Local Inference for maximum privacy).
 * **Language:** Python 3.10+ with virtual environment management (`venv`).
->>>>>>> 357d975 (docs: add bilingual support (English/Italian))
 
 ### 🧠 Intelligence Engine
 The system's decision-making core is powered by:
@@ -45,11 +31,7 @@ Designed following **Object-Oriented Programming (OOP)** principles and the **St
 
 ---
 
-<<<<<<< HEAD
-##  Caratteristiche Principali
-=======
 ## 🚀 Key Features
->>>>>>> 357d975 (docs: add bilingual support (English/Italian))
 
 - **🤖 Autonomous Decision Making:** The AI doesn't follow a linear script; it decides which tool to use based on the received output.
 - **🔍 Version Fingerprinting:** Using Nmap (`-sV`), the agent extracts exact service versions for pinpoint accuracy.
@@ -59,11 +41,7 @@ Designed following **Object-Oriented Programming (OOP)** principles and the **St
 
 ---
 
-<<<<<<< HEAD
-##  Dimostrazione Operativa
-=======
 ## 📸 Operational Demo
->>>>>>> 357d975 (docs: add bilingual support (English/Italian))
 
 ### 1. Terminal User Interface (TUI)
 The main interface shows the agent in action. Once the target is set, the system initiates the **ReAct** reasoning cycle, displaying selected tools and the AI's decision-making process in real-time.
@@ -81,7 +59,7 @@ At the end of the session, RedTeam-GPT generates a summary report in the termina
 
 1.  **Clone the Repo:**
     ```bash
-    git clone https://github.com/isilderrr1/redteam-gpt.git
+    git clone [https://github.com/isilderrr1/redteam-gpt.git](https://github.com/isilderrr1/redteam-gpt.git)
     cd redteam-gpt
     ```
 2.  **Setup the Environment:**
@@ -99,14 +77,7 @@ At the end of the session, RedTeam-GPT generates a summary report in the termina
 
 ---
 
-<<<<<<< HEAD
-##  Etica e Disclaimer
-Questo progetto è stato creato per scopi **puramente educativi** e per la ricerca sulla sicurezza informatica. L'utilizzo di RedTeam-GPT contro target senza previa autorizzazione scritta è illegale e immorale. L'autore non si assume alcuna responsabilità per danni derivanti dall'uso improprio di questo software.
-
-**Developed  by Antonio Ruocco**
-=======
 ## ⚖️ Ethics and Disclaimer
 This project was created for **purely educational purposes** and cybersecurity research. Using RedTeam-GPT against targets without prior written authorization is illegal and unethical. The author assumes no responsibility for any damage resulting from the misuse of this software.
 
 **Developed with 🔴 by Antonio Ruocco**
->>>>>>> 357d975 (docs: add bilingual support (English/Italian))
