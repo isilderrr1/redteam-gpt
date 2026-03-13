@@ -56,7 +56,7 @@ Al termine della sessione, RedTeam-GPT genera un report sintetico direttamente n
 
 1.  **Clona il Repo:**
     ```bash
-    git clone [https://github.com/isilderrr1/redteam-gpt.git](https://github.com/isilderrr1/redteam-gpt.git)
+    git clone https://github.com/isilderrr1/redteam-gpt.git
     cd redteam-gpt
     ```
 2.  **Configura l'Ambiente:**
