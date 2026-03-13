@@ -9,14 +9,14 @@
 
 ---
 
-## 🛠️ Ambiente di Sviluppo & Architettura
+##  Ambiente di Sviluppo & Architettura
 
 Il progetto è stato sviluppato in un ecosistema moderno e ad alte prestazioni:
 * **OS:** Ubuntu via WSL2 (Windows Subsystem for Linux).
 * **IDE:** Visual Studio Code.
 * **LLM Engine:** LM Studio / Ollama (Local Inference per la massima privacy).
 * **Language:** Python 3.10+ con gestione ambienti virtuali (`venv`).
-### 🧠 Intelligence Engine
+###  Intelligence Engine
 Il cuore decisionale del sistema è alimentato da:
 * **LLM:** [DeepSeek-R1-14B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-14B)
 * **Inference Server:** LM Studio / Ollama.
@@ -30,7 +30,7 @@ Il sistema è progettato seguendo i principi della **Programmazione Orientata ag
 
 ---
 
-## 🚀 Caratteristiche Principali
+##  Caratteristiche Principali
 
 - **🤖 Decision Making Autonomo:** L'AI non segue uno script lineare, ma decide quale tool usare in base all'output ricevuto.
 - **🔍 Version Fingerprinting:** Grazie a Nmap (`-sV`), l'agente estrae le versioni esatte dei servizi per una precisione millimetrica.
@@ -40,7 +40,7 @@ Il sistema è progettato seguendo i principi della **Programmazione Orientata ag
 
 ---
 
-## 📸 Dimostrazione Operativa
+##  Dimostrazione Operativa
 
 ### 1. Terminal User Interface (TUI)
 L'interfaccia principale mostra l'agente in azione. Una volta ricevuto l'obiettivo, il sistema avvia il ciclo di ragionamento **ReAct**, mostrando in tempo reale i tool selezionati e il processo decisionale dell'intelligenza artificiale.
@@ -74,7 +74,7 @@ Al termine della sessione, RedTeam-GPT genera un report sintetico direttamente n
 
 ---
 
-## ⚖️ Etica e Disclaimer
+##  Etica e Disclaimer
 Questo progetto è stato creato per scopi **puramente educativi** e per la ricerca sulla sicurezza informatica. L'utilizzo di RedTeam-GPT contro target senza previa autorizzazione scritta è illegale e immorale. L'autore non si assume alcuna responsabilità per danni derivanti dall'uso improprio di questo software.
 
-**Developed with 🔴 by [Antonio Ruocco]**
+**Developed  by Antonio Ruocco**
