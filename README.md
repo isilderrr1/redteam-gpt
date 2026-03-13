@@ -18,7 +18,7 @@ Il progetto è stato sviluppato in un ecosistema moderno e ad alte prestazioni:
 * **Language:** Python 3.10+ con gestione ambienti virtuali (`venv`).
 ### 🧠 Intelligence Engine
 Il cuore decisionale del sistema è alimentato da:
-* **LLM:** [DeepSeek-R1-14B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-14B) (o la versione che stai usando).
+* **LLM:** [DeepSeek-R1-14B](https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-14B)
 * **Inference Server:** LM Studio / Ollama.
 * **Reasoning Model:** Il sistema sfrutta le capacità di *Chain-of-Thought* di DeepSeek per analizzare i risultati dei tool e pianificare i passi successivi in modo autonomo.
 
