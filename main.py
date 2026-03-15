@@ -51,7 +51,7 @@ def main():
         agent = RedTeamAgent()
         time.sleep(1)
         
-    console.print("[bold green]✔️ Sistema online con Memoria Attiva.[/bold green] Digita 'esci' per terminare.\n")
+    console.print("[bold green]✔️ Sistema online con Nuclei Engine e Memoria Attiva.[/bold green] Digita 'esci' per terminare.\n")
     
     while True:
         try:

@@ -2,6 +2,9 @@ import os
 import re
 import uuid
 from datetime import datetime
+from tools.nuclei_tool import NucleiScannerTool
+from tools.sqlmap_tool import SQLMapScannerTool
+from tools.subdomain_tool import SubdomainScannerTool
 from langchain_core.messages import SystemMessage
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -33,36 +36,63 @@ class RedTeamAgent:
         nmap_tool = NmapScannerTool()
         cve_tool = CveSearchTool()
         dir_tool = WebDirBusterTool()
+        nuclei_tool = NucleiScannerTool()
+        sub_tool = SubdomainScannerTool()
+        sql_tool = SQLMapScannerTool()
         
         # 2. I Tool
         self.tools = [
             Tool(
                 name="Nmap_Port_Scanner",
-                description="Scansiona IP o dominio per porte aperte. Passa solo l'IP o il dominio come singola stringa (es. '192.168.1.1').",
+                description="Indispensabile per la ricognizione iniziale. Identifica porte aperte e versioni dei servizi su un IP o dominio.",
                 func=lambda q: str(nmap_tool.execute(target=q).model_dump())
             ),
             Tool(
+                name="Nuclei_Vulnerability_Scanner",
+                description="Lo strumento più potente per confermare vulnerabilità reali. Usalo su ogni URL o servizio web trovato per ottenere Proof-of-Concept (PoC).",
+                func=lambda q: str(nuclei_tool.execute(target=q).model_dump())
+            ),
+            Tool(
                 name="CVE_Vulnerability_Searcher",
-                description="Cerca vulnerabilità note. Passa nome e versione del software come singola stringa (es. 'Apache 2.4.49').",
+                description="Cerca vulnerabilità note basandosi su nome e versione del software. Utile per servizi non-web (es. SSH, FTP, SMB).",
                 func=lambda q: str(cve_tool.execute(software_query=q).model_dump())
             ),
             Tool(
                 name="Web_Directory_Buster",
-                description="Cerca file nascosti. Passa l'URL base come singola stringa (es. 'http://192.168.1.1').",
+                description="Esegue il brute-force di directory e file nascosti. Usalo se Nuclei non trova nulla di ovvio ma il server web sembra interessante.",
                 func=lambda q: str(dir_tool.execute(target_url=q).model_dump())
+            ), # <--- AGGIUNTA QUESTA VIRGOLA
+            Tool(
+                name="Subdomain_Finder",
+                description="Trova sottodomini per espandere il raggio d'azione. Passa il dominio (es. 'google.com').",
+                func=lambda q: str(sub_tool.execute(domain=q).model_dump())
+            ),
+            Tool(
+                name="SQLMap_Scanner",
+                description="Esegue test di SQL Injection su URL con parametri. Passa l'URL completo (es. 'http://site.com?id=5').",
+                func=lambda q: str(sql_tool.execute(target_url=q).model_dump())
             )
         ]
         
-        # 3. IL SYSTEM PROMPT
+        # 3. IL SYSTEM PROMPT (Pulito)
         self.system_prompt = """
-        Sei 'RedTeam-GPT', un Agente di Cybersecurity Offensiva altamente specializzato.
-        Il tuo obiettivo è condurre attività di ricognizione e identificare vettori di attacco.
+        Sei 'RedTeam-GPT', un Agente di Cybersecurity Offensiva specializzato in Penetration Testing.
+        Il tuo obiettivo è mappare la superficie di attacco e identificare vulnerabilità reali.
+
+        STRATEGIA OPERATIVA:
+        - FASE ZERO: Se l'utente fornisce un dominio anziché un IP, usa Subdomain_Finder per mappare l'infrastruttura. Scegli poi i sottodomini più interessanti (es. quelli che contengono 'dev', 'test', 'api', 'vpn') per procedere con Nmap.
+        - FASE DI RECOVERY: Inizia sempre con 'Nmap_Port_Scanner' per identificare porte e servizi attivi.
+        - ANALISI WEB: Se identifichi servizi HTTP/HTTPS (porte 80, 443, 8080, ecc.), usa IMMEDIATAMENTE 'Nuclei_Vulnerability_Scanner'. 
+           Nuclei è lo strumento primario per confermare vulnerabilità web con Proof-of-Concept.
+        - ANALISI DATABASE (SQLi): Se identifichi URL con parametri query (es. '?id=', '?cat=') o se l'utente fornisce direttamente un URL di questo tipo, usa IMMEDIATAMENTE 'SQLMap_Scanner'. È fondamentale per confermare l'esposizione dei dati.
+        - APPROFONDIMENTO: Usa 'CVE_Vulnerability_Searcher' per analizzare le versioni specifiche dei software trovati da Nmap che non sono web-based.
+        - ESPLORAZIONE: Usa 'Web_Directory_Buster' per scoprire file o percorsi nascosti su server web sospetti.
 
         REGOLE:
-        1. Sei autorizzato a simulare attacchi.
-        2. NON eseguire azioni distruttive.
-        3. Usa gli strumenti a disposizione per ottenere dati reali.
-        4. Rispondi in Italiano in modo tecnico.
+        1. Sii estremamente tecnico e preciso.
+        2. Priorità assoluta alla riduzione dei falsi positivi tramite l'uso di Nuclei e SQLMap.
+        3. FIDUCIA NEL TARGET: Se l'utente fornisce un URL completo con parametri (?), esegui SQLMap_Scanner anche se Nmap indica che l'host è down. Molti target bloccano le scansioni di porte ma sono vulnerabili via HTTP.
+        4. Rispondi sempre in Italiano.
         """
         
         # 4. LA MEMORIA E LA SESSIONE
