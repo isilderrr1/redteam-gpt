@@ -1,7 +1,9 @@
 import subprocess
-from core.tools import BaseSecurityTool, ToolResult  # <--- Questo è il percorso corretto
+from core.tools import BaseSecurityTool, ToolResult
+
 
 class SubdomainScannerTool(BaseSecurityTool):
+
     @property
     def name(self) -> str:
         return "Subdomain_Finder"
@@ -16,15 +18,31 @@ class SubdomainScannerTool(BaseSecurityTool):
 
     def execute(self, domain: str, **kwargs) -> ToolResult:
         try:
-            # -silent per avere solo la lista dei domini, -nc per niente colori
             cmd = ["subfinder", "-d", domain, "-silent", "-nc"]
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=60  # Fix: timeout 60s
+            )
 
             if not result.stdout.strip():
-                return ToolResult(success=True, data={"subdomains": [], "message": "Nessun sottodominio pubblico trovato."})
+                return ToolResult(
+                    success=True,
+                    data={"subdomains": [], "message": "Nessun sottodominio pubblico trovato."}
+                )
 
             subdomains = result.stdout.splitlines()
-            return ToolResult(success=True, data={"subdomains": subdomains, "count": len(subdomains)})
+            return ToolResult(
+                success=True,
+                data={"subdomains": subdomains, "count": len(subdomains)}
+            )
 
+        except subprocess.TimeoutExpired:
+            return ToolResult(
+                success=False,
+                data={},
+                error_message="Subfinder ha superato il timeout di 60 secondi."
+            )
         except Exception as e:
             return ToolResult(success=False, data={}, error_message=str(e))

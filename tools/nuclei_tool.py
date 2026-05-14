@@ -1,11 +1,9 @@
 import subprocess
 import json
-from core.tools import BaseSecurityTool, ToolResult # <--- Questo dice a Python di partire dalla root
+from core.tools import BaseSecurityTool, ToolResult
+
 
 class NucleiScannerTool(BaseSecurityTool):
-    """
-    Integrazione di Nuclei Scanner per il rilevamento avanzato di vulnerabilità.
-    """
 
     @property
     def name(self) -> str:
@@ -14,41 +12,97 @@ class NucleiScannerTool(BaseSecurityTool):
     @property
     def description(self) -> str:
         return (
-            "Esegue una scansione di vulnerabilità approfondita su un URL o IP. "
-            "Usa questo strumento dopo Nmap se trovi servizi web (HTTP/HTTPS) "
-            "per trovare CVE specifiche, misconfigurations e pannelli esposti."
+            "Esegue una scansione di vulnerabilita' approfondita su un URL o IP. "
+            "Usa questo strumento dopo Nmap su ogni URL presente in 'web_endpoints'. "
+            "Trova CVE specifiche, misconfiguration, pannelli esposti e vulnerabilita' critiche."
         )
 
     def execute(self, target: str, **kwargs) -> ToolResult:
         try:
-            # Assicuriamoci che il target abbia un protocollo per Nuclei
-            scan_target = target if target.startswith(("http://", "https://")) else f"http://{target}"
+            scan_target = (
+                target if target.startswith(("http://", "https://"))
+                else f"http://{target}"
+            )
 
-            # Comando: -jsonl per output strutturato, -silent per evitare banner
-            cmd = ["nuclei", "-u", scan_target, "-jsonl", "-silent", "-nc"]
-            
-            result = subprocess.run(cmd, capture_output=True, text=True)
+            cmd = [
+                "nuclei",
+                "-u", scan_target,
+                "-t", "cves,exposed-panels,misconfiguration,vulnerabilities",
+                "-c", "25",
+                "-timeout", "10",
+                "-jsonl",
+                "-silent",
+                "-nc"
+            ]
+
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=180
+            )
 
             if not result.stdout.strip():
                 return ToolResult(
-                    success=True, 
-                    data={"message": "Nessuna vulnerabilità rilevata da Nuclei."},
-                    error_message=""
+                    success=True,
+                    data={
+                        "target": scan_target,
+                        "message": (
+                            "Nessuna vulnerabilita' rilevata dai template "
+                            "cves/exposed-panels/misconfiguration/vulnerabilities."
+                        ),
+                        "count": 0
+                    }
                 )
 
             findings = []
+            severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
+
             for line in result.stdout.splitlines():
-                if line.strip():
+                if not line.strip():
+                    continue
+                try:
                     data = json.loads(line)
-                    findings.append({
+                    severity = data.get("info", {}).get("severity", "unknown").lower()
+
+                    finding = {
                         "id": data.get("template-id"),
                         "name": data.get("info", {}).get("name"),
-                        "severity": data.get("info", {}).get("severity"),
+                        "severity": severity,
                         "description": data.get("info", {}).get("description", "N/A"),
-                        "matcher": data.get("matcher-name", "N/A")
-                    })
+                        "matched_url": data.get("matched-at", scan_target),
+                        "matcher": data.get("matcher-name", "N/A"),
+                        "tags": data.get("info", {}).get("tags", [])
+                    }
+                    findings.append(finding)
 
-            return ToolResult(success=True, data={"vulnerabilities": findings}, error_message="")
+                    if severity in severity_counts:
+                        severity_counts[severity] += 1
 
+                except json.JSONDecodeError:
+                    continue
+
+            severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4, "unknown": 5}
+            findings.sort(key=lambda x: severity_order.get(x["severity"], 5))
+
+            return ToolResult(
+                success=True,
+                data={
+                    "target": scan_target,
+                    "count": len(findings),
+                    "severity_summary": severity_counts,
+                    "vulnerabilities": findings
+                }
+            )
+
+        except subprocess.TimeoutExpired:
+            return ToolResult(
+                success=False,
+                data={},
+                error_message=(
+                    f"Nuclei ha superato il timeout di 180 secondi su {target}. "
+                    "Il server potrebbe star bloccando le scansioni o essere molto lento."
+                )
+            )
         except Exception as e:
             return ToolResult(success=False, data={}, error_message=str(e))
